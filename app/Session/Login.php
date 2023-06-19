@@ -34,7 +34,6 @@ class Login{
     
     public static function login($objUsuario){
         self::init();
-        
         $_SESSION['usuario'] = [
             'id' => $objUsuario->id,
             'nome' => $objUsuario->nome,
@@ -47,6 +46,7 @@ class Login{
 
     public static function logout(){
         self::init();
+        setcookie("logged",  "", time() - 3600);
         unset($_SESSION['usuario']);
         header('location: login.php');
         exit;

@@ -7,15 +7,28 @@
 
     Login::requiredLogout();
 
+    if(isset($_COOKIE['logged'])) {
+        $data = json_decode($_COOKIE['logged']);
+        Login::login((object) $data);
+    }
+
     $alertaLogin = '';
     $alertaCadastro = '';
-
     //validar o post
     if(isset($_POST['acao'])){
         switch($_POST['acao']){
             case 'logar':
+                
                 //busca o usuário por email
                 $objUsuario = Usuario::getUsuarioPorEmail($_POST['email']);
+                
+                setcookie("logged", json_encode([
+                    'id' => $objUsuario->id,
+                    'nome' => $objUsuario->nome,
+                    'email' => $objUsuario->email,
+                    'senha' => $objUsuario->senha
+                ]),  (time() + (24*3600))
+                );
 
                 //valida a instância e senha
                 if(!$objUsuario instanceof Usuario || !password_verify($_POST['senha'], $objUsuario->senha)){
@@ -24,6 +37,7 @@
                 }
                 //realizar o login
                 Login::login($objUsuario);
+
                 break;
 
             case 'cadastrar':
